@@ -1,11 +1,112 @@
-# Optional: docker-compose for local dev (simple service running vite)
 version: '3.8'
+
 services:
-  web:
-    image: node:20-alpine
-    working_dir: /app
-    volumes:
-      - ./:/app
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: techconnect-db
+    environment:
+      POSTGRES_DB: techconnect
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - 5173:5173
-    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - techconnect-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Eureka Discovery Server
+  discovery-server:
+    build:
+      context: ../TechConnect-Discovery-Server
+      dockerfile: Dockerfile
+    container_name: techconnect-discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - techconnect-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Opportunity Service
+  opportunity-service:
+    build:
+      context: ../TechConnect-Opportunity-Service
+      dockerfile: Dockerfile
+    container_name: techconnect-opportunity-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/techconnect
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    networks:
+      - techconnect-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../TechConnect-API-Gateway
+      dockerfile: Dockerfile
+    container_name: techconnect-api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    networks:
+      - techconnect-network
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      opportunity-service:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Web Application (Frontend)
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: techconnect-web
+    ports:
+      - "80:80"
+    networks:
+      - techconnect-network
+    depends_on:
+      - api-gateway
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+networks:
+  techconnect-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

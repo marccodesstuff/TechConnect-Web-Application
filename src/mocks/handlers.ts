@@ -1,50 +1,52 @@
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { sampleOpportunities } from './data'
 
 export const handlers = [
-  rest.get('/api/opportunities', (req, res, ctx) => {
-    const page = Number(req.url.searchParams.get('page') || '1')
-    const size = Number(req.url.searchParams.get('size') || '10')
-    const query = req.url.searchParams.get('query') || ''
+  http.get('/api/opportunities', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') || '1')
+    const size = Number(url.searchParams.get('size') || '10')
+    const query = url.searchParams.get('query') || ''
     let items = sampleOpportunities
     if (query) {
       items = items.filter((it) => it.title.toLowerCase().includes(query.toLowerCase()) || (it.tags || []).some((t) => t.includes(query)))
     }
     const start = (page - 1) * size
     const pageItems = items.slice(start, start + size)
-    return res(ctx.status(200), ctx.json({ items: pageItems, page, total: items.length }))
+    return HttpResponse.json({ items: pageItems, page, total: items.length })
   }),
 
-  rest.get('/api/opportunities/:id', (req, res, ctx) => {
-    const { id } = req.params as { id: string }
+  http.get('/api/opportunities/:id', ({ params }) => {
+    const { id } = params as { id: string }
     const found = sampleOpportunities.find((it) => it.id === id)
-    if (!found) return res(ctx.status(404), ctx.json({ message: 'Not found' }))
-    return res(ctx.status(200), ctx.json(found))
+    if (!found) return HttpResponse.json({ message: 'Not found' }, { status: 404 })
+    return HttpResponse.json(found)
   }),
 
-  rest.post('/api/opportunities', async (req, res, ctx) => {
-    const body = await req.json()
+  http.post('/api/opportunities', async ({ request }) => {
+    const body = await request.json() as any
     const id = String(Date.now())
     const created = { ...body, id, verified: 'pending', fetchedAt: new Date().toISOString() }
     sampleOpportunities.unshift(created)
-    return res(ctx.status(201), ctx.json({ id }))
+    return HttpResponse.json({ id }, { status: 201 })
   }),
 
   // Admin endpoints
-  rest.get('/api/admin/opportunities', (req, res, ctx) => {
-    const status = req.url.searchParams.get('status') || 'pending'
+  http.get('/api/admin/opportunities', ({ request }) => {
+    const url = new URL(request.url)
+    const status = url.searchParams.get('status') || 'pending'
     const items = sampleOpportunities.filter((it) => it.verified === 'pending')
-    return res(ctx.status(200), ctx.json({ items }))
+    return HttpResponse.json({ items })
   }),
 
-  rest.post('/api/admin/opportunities/:id/verify', async (req, res, ctx) => {
-    const { id } = req.params as { id: string }
-    const body = await req.json()
+  http.post('/api/admin/opportunities/:id/verify', async ({ params, request }) => {
+    const { id } = params as { id: string }
+    const body = await request.json() as any
     const action = body.action as 'approve' | 'deny'
     const idx = sampleOpportunities.findIndex((it) => it.id === id)
-    if (idx === -1) return res(ctx.status(404), ctx.json({ message: 'Not found' }))
+    if (idx === -1) return HttpResponse.json({ message: 'Not found' }, { status: 404 })
     if (action === 'approve') sampleOpportunities[idx].verified = true
     if (action === 'deny') sampleOpportunities.splice(idx, 1)
-    return res(ctx.status(200), ctx.json({ status: action }))
+    return HttpResponse.json({ status: action })
   })
 ]
