@@ -1,3 +1,9 @@
+export interface BackendResponse<T> {
+  status: number;
+  message: string;
+  data: T;
+}
+
 export async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init)
   if (!res.ok) {
@@ -8,16 +14,17 @@ export async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> 
 }
 
 export type Opportunity = {
-  id: string
+  id: number | string
   title: string
-  type: 'event' | 'certification'
-  provider: string
+  type: 'HACKATHON' | 'CERTIFICATION' | 'PROMO' | 'event' | 'certification' | 'promo'
+  description?: string
   startDate?: string
   endDate?: string
+  // Fields for MSW/Legacy compatibility
+  provider?: string
   location?: { city?: string; country?: string }
   cost?: number | 'free'
-  url: string
-  description?: string
+  url?: string
   tags?: string[]
   source?: string
   verified?: boolean | 'pending'
@@ -28,13 +35,52 @@ export type PagedResponse<T> = { items: T[]; page: number; total: number }
 
 export async function getOpportunities(query = ''): Promise<PagedResponse<Opportunity>> {
   const params = query ? `?${query}` : ''
-  return fetchJSON<PagedResponse<Opportunity>>(`/api/opportunities${params}`)
+  const response = await fetchJSON<BackendResponse<Opportunity[]> | PagedResponse<Opportunity>>(`/api/opportunities${params}`)
+
+  // Handle backend wrapper if present
+  if ('data' in response && Array.isArray(response.data)) {
+    return {
+      items: response.data,
+      page: 1,
+      total: response.data.length
+    }
+  }
+
+  // Handle MSW/Legacy direct response
+  return response as PagedResponse<Opportunity>
 }
 
 export async function getOpportunity(id: string): Promise<Opportunity> {
-  return fetchJSON<Opportunity>(`/api/opportunities/${id}`)
+  const response = await fetchJSON<BackendResponse<Opportunity> | Opportunity>(`/api/opportunities/${id}`)
+  if ('data' in response && !Array.isArray(response.data)) {
+    return response.data as Opportunity
+  }
+  return response as Opportunity
 }
 
 export async function submitOpportunity(payload: Partial<Opportunity>) {
-  return fetchJSON<{ id: string }>('/api/opportunities', { method: 'POST', body: JSON.stringify(payload), headers: { 'Content-Type': 'application/json' } })
+  // Map types for backend
+  let mappedType = payload.type;
+  if (mappedType === 'event') mappedType = 'HACKATHON';
+  if (mappedType === 'certification') mappedType = 'CERTIFICATION';
+
+  // Filter for backend-only fields
+  const backendPayload = {
+    title: payload.title,
+    description: payload.description,
+    startDate: payload.startDate,
+    endDate: payload.endDate,
+    type: mappedType
+  };
+
+  const response = await fetchJSON<BackendResponse<{ id: string | number }> | { id: string | number }>('/api/opportunities', {
+    method: 'POST',
+    body: JSON.stringify(backendPayload),
+    headers: { 'Content-Type': 'application/json' }
+  })
+
+  if ('data' in response && response.data) {
+    return { id: String(response.data.id) };
+  }
+  return { id: String((response as any).id) };
 }
