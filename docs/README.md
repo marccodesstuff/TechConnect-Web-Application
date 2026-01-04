@@ -1,45 +1,43 @@
-# TechConnect Web Application Docs
+# TechConnect Web Application Documentation
 
-Welcome! This documentation will help you understand, build, and deploy the TechConnect frontend.
+Welcome! This documentation provides a comprehensive guide to understanding, developing, and operating the TechConnect frontend.
 
-## New to the project?
+## 🚀 Getting Started
 
-Start here to get up and running:
+New to the project? Start here to get your environment configured and understand the basics.
 
-**[Setup Guide](./getting-started/setup.md)** – Get your development environment configured  
-**[Project Structure](./getting-started/project-structure.md)** – Understand how the codebase is organized
+- **[Setup Guide](./getting-started/setup.md)** – Configure your local development environment.
+- **[Project Structure](./getting-started/project-structure.md)** – Overview of the codebase organization.
 
-## Development Guides
+## 🛠️ Development Guides
 
-Everything you need for day-to-day development:
+Resources for day-to-day development, coding standards, and testing.
 
-**[Development Workflow](./guides/development.md)** – Coding standards, git workflow, debugging  
-**[Testing](./guides/testing.md)** – Write and run tests with Vitest  
-**[Deployment](./guides/deployment.md)** – Ship to production with Docker or static hosting  
-**[Troubleshooting](./guides/troubleshooting.md)** – Fix common problems  
-**[Contributing](./guides/contributing.md)** – Guidelines for contributors
+- **[Development Workflow](./guides/development.md)** – Coding standards, git workflow, and debugging.
+- **[Testing](./guides/testing.md)** – How to write and run tests with Vitest.
+- **[Styling](./reference/styling.md)** – Using Tailwind CSS and design tokens.
+- **[Components](./reference/components.md)** – Reusable UI components and patterns.
 
-## Technical Reference
+## ⚙️ Operations & Deployment
 
-Deep dives into specific topics:
+Critical information for running, integrating, and deploying the application.
 
-**[Architecture Overview](./reference/architecture.md)** – How the app is structured and why  
-**[Components](./reference/components.md)** – Reusable UI components and patterns  
-**[State Management](./reference/state-management.md)** – React hooks and state patterns  
-**[API Integration](./reference/api-integration.md)** – Working with the backend API  
-**[Styling](./reference/styling.md)** – Tailwind CSS conventions  
-**[Environment Config](./reference/environment.md)** – Managing environment variables
+- **[System Context](./operations/system-context.md)** – How this app app fits into the TechConnect ecosystem.
+- **[Environment Orchestration](./operations/environment-orchestration.md)** – Running against mocks vs. local backends.
+- **[Deployment](./guides/deployment.md)** – Shipping to production with Docker or static hosting.
+- **[Environment Config](./reference/environment.md)** – Managing environment variables.
 
-## Tech Stack
+## 📚 Technical Reference
 
-Built with modern web technologies:
+Deep dives into the internal architecture and patterns.
 
-React 18 + TypeScript for type-safe component development  
-Vite for lightning-fast builds and hot module replacement  
-Tailwind CSS for utility-first styling  
-Vitest and React Testing Library for comprehensive testing  
-MSW (Mock Service Worker) for API mocking during development
+- **[Architecture Overview](./reference/architecture.md)** – High-level design and data flow.
+- **[State Management](./reference/state-management.md)** – Patterns for managing app state.
+- **[API Integration](./reference/api-integration.md)** – Technical details on backend communication.
+- **[Troubleshooting](./guides/troubleshooting.md)** – Fix common problems.
+- **[Contributing](./guides/contributing.md)** – Guidelines for project contributors.
 
-## Quick References
+---
 
+**Quick Links:**
 [Main Project README](../README.md) • [Setup Notes](../README_SETUP_NOTES.md) • [Docker Guide](../DOCKER_DEPLOYMENT.md)

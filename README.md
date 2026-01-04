@@ -1,8 +1,17 @@
-# TechConnect Web (Vite + React + Tailwind)
+# TechConnect Web Application
 
-This folder contains a scaffolded Vite + React + TypeScript app wired for Tailwind and prepared for shadcn-style components.
+The frontend for the TechConnect ecosystem, built with React, TypeScript, and Vite.
 
-## Quick start
+## 📖 Documentation
+
+A comprehensive guide to the operation, development, and architecture of this repository can be found in the **[docs/ folder](./docs/README.md)**.
+
+### Quick Links
+- **[Getting Started](./docs/getting-started/setup.md)**
+- **[Operations Guide](./docs/operations/environment-orchestration.md)**
+- **[System Context](./docs/operations/system-context.md)**
+
+## Quick Start
 
 1. cd into `web`
 2. Install dependencies: `npm install` or `pnpm install`
