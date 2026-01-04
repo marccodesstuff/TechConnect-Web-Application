@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { submitOpportunity } from '../lib/api'
+import { submitOpportunity, Opportunity } from '../lib/api'
 import Input from '../components/ui/Input'
 
 export default function Submit() {
@@ -8,7 +8,7 @@ export default function Submit() {
   const [error, setError] = useState<string | null>(null)
 
   const [title, setTitle] = useState('')
-  const [type, setType] = useState<'event' | 'certification'>('event')
+  const [type, setType] = useState<Opportunity['type']>('event')
   const [provider, setProvider] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -20,8 +20,8 @@ export default function Submit() {
     setSubmitting(true)
     setError(null)
     try {
-      if (!title || !provider || !url) {
-        setError('Please fill required fields')
+      if (!title || !provider || !url || !startDate || !endDate) {
+        setError('Please fill required fields (Title, Provider, URL, and Dates)')
         setSubmitting(false)
         return
       }
@@ -47,33 +47,34 @@ export default function Submit() {
         {error && <div role="alert" className="text-sm text-rose-700">{error}</div>}
 
         <label className="block text-sm">Title *</label>
-        <Input value={title} onChange={(e) => setTitle((e.target as HTMLInputElement).value)} />
+        <Input value={title} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)} />
 
         <label className="block text-sm">Type</label>
-        <select value={type} onChange={(e) => setType(e.target.value as any)} className="w-full border rounded px-2 py-1 text-sm">
+        <select value={type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setType(e.target.value as any)} className="w-full border rounded px-2 py-1 text-sm">
           <option value="event">Event</option>
           <option value="certification">Certification</option>
+          <option value="promo">Promo</option>
         </select>
 
         <label className="block text-sm">Provider *</label>
-        <Input value={provider} onChange={(e) => setProvider((e.target as HTMLInputElement).value)} />
+        <Input value={provider} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setProvider(e.target.value)} />
 
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-sm">Start date</label>
-            <Input type="date" value={startDate} onChange={(e) => setStartDate((e.target as HTMLInputElement).value)} />
+            <Input type="date" value={startDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartDate(e.target.value)} />
           </div>
           <div>
             <label className="block text-sm">End date</label>
-            <Input type="date" value={endDate} onChange={(e) => setEndDate((e.target as HTMLInputElement).value)} />
+            <Input type="date" value={endDate} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEndDate(e.target.value)} />
           </div>
         </div>
 
         <label className="block text-sm">URL *</label>
-        <Input value={url} onChange={(e) => setUrl((e.target as HTMLInputElement).value)} />
+        <Input value={url} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUrl(e.target.value)} />
 
         <label className="block text-sm">Description</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} className="w-full border rounded px-2 py-1 text-sm" />
+        <textarea value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} className="w-full border rounded px-2 py-1 text-sm" />
 
         <div className="flex items-center justify-between">
           <button type="submit" disabled={submitting} className="bg-sky-600 text-white px-4 py-2 rounded">Submit</button>
