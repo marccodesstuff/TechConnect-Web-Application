@@ -133,3 +133,62 @@ export async function markNotificationRead(id: number, token: string) {
     headers: { Authorization: `Bearer ${token}` }
   })
 }
+
+// Team Requests
+export type TeamRequestResponse = {
+  id: number
+  opportunityId: number
+  username: string
+  message: string
+  createdAt: string
+}
+
+export async function joinTeamLobby(opportunityId: string | number, message: string, token: string) {
+  return fetchJSON(`/api/opportunities/${opportunityId}/team-requests`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ message })
+  })
+}
+
+export async function leaveTeamLobby(opportunityId: string | number, token: string) {
+  return fetchJSON(`/api/opportunities/${opportunityId}/team-requests`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export async function getTeamRequests(opportunityId: string | number): Promise<TeamRequestResponse[]> {
+  const res = await fetchJSON<BackendResponse<TeamRequestResponse[]>>(`/api/opportunities/${opportunityId}/team-requests`)
+  return res.data
+}
+
+// Insights
+export type InsightRequest = {
+  verdict: 'RECOMMENDED' | 'MIXED' | 'NOT_RECOMMENDED'
+  comment: string
+  tags: string[]
+}
+
+export type InsightResponse = {
+  id: number
+  opportunityId: number
+  username: string
+  verdict: 'RECOMMENDED' | 'MIXED' | 'NOT_RECOMMENDED'
+  comment: string
+  tags: string[]
+  createdAt: string
+}
+
+export async function addInsight(opportunityId: string | number, request: InsightRequest, token: string) {
+  return fetchJSON(`/api/opportunities/${opportunityId}/insights`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(request)
+  })
+}
+
+export async function getInsights(opportunityId: string | number): Promise<InsightResponse[]> {
+  const res = await fetchJSON<BackendResponse<InsightResponse[]>>(`/api/opportunities/${opportunityId}/insights`)
+  return res.data
+}
