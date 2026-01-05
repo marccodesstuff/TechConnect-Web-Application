@@ -192,3 +192,60 @@ export async function getInsights(opportunityId: string | number): Promise<Insig
   const res = await fetchJSON<BackendResponse<InsightResponse[]>>(`/api/opportunities/${opportunityId}/insights`)
   return res.data
 }
+
+// Forum
+export type ForumCategory = {
+  id: number
+  name: string
+  description: string
+  slug: string
+}
+
+export type ForumPost = {
+  id: number
+  content: string
+  author: { username: string } // Backend returns User object, simplified here
+  createdAt: string
+}
+
+export type ForumThread = {
+  id: number
+  title: string
+  content: string
+  author: { username: string }
+  viewCount: number
+  createdAt: string
+  updatedAt: string
+  posts: ForumPost[]
+}
+
+export async function getForumCategories(): Promise<ForumCategory[]> {
+  const res = await fetchJSON<BackendResponse<ForumCategory[]>>('/api/forum/categories')
+  return res.data
+}
+
+export async function getForumThreads(categoryId: number): Promise<ForumThread[]> {
+  const res = await fetchJSON<BackendResponse<ForumThread[]>>(`/api/forum/categories/${categoryId}/threads`)
+  return res.data
+}
+
+export async function createForumThread(categoryId: number, title: string, content: string, token: string) {
+  return fetchJSON(`/api/forum/categories/${categoryId}/threads`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ title, content })
+  })
+}
+
+export async function getForumThread(id: string | number): Promise<ForumThread> {
+  const res = await fetchJSON<BackendResponse<ForumThread>>(`/api/forum/threads/${id}`)
+  return res.data
+}
+
+export async function createForumPost(threadId: string | number, content: string, token: string) {
+  return fetchJSON(`/api/forum/threads/${threadId}/posts`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ content })
+  })
+}

@@ -8,8 +8,9 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import { ThemeProvider, useTheme } from './context/ThemeContext' // Import Theme stuff
-import NotificationBell from './components/NotificationBell'
+import { ThemeProvider, useTheme } from './context/ThemeContext'
+import Forum from './pages/Forum'
+import ThreadDetail from './pages/ThreadDetail'
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
@@ -22,6 +23,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           <Link to="/" className="font-bold text-lg">TechConnect</Link>
           <nav className="flex gap-3 items-center">
             <Link to="/opportunities" className="text-sm text-slate-700 dark:text-slate-300">Opportunities</Link>
+            <Link to="/forum" className="text-sm text-slate-700 dark:text-slate-300 font-medium text-sky-600 dark:text-sky-400">Forums</Link>
             {user && <Link to="/submit" className="text-sm text-slate-700 dark:text-slate-300">Submit</Link>}
             {user?.role === 'ADMIN' && <Link to="/admin" className="text-sm text-slate-700 dark:text-slate-300">Admin</Link>}
 
@@ -70,6 +72,8 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/forum" element={<Forum />} />
+              <Route path="/forum/thread/:id" element={<ThreadDetail />} />
             </Routes>
           </Layout>
         </BrowserRouter>
