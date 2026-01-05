@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { submitOpportunity, Opportunity } from '../lib/api'
 import Input from '../components/ui/Input'
+import { useAuth } from '../context/AuthContext'
 
 export default function Submit() {
+  const { user } = useAuth()
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -15,23 +17,61 @@ export default function Submit() {
   const [url, setUrl] = useState('')
   const [description, setDescription] = useState('')
 
+  // Tag state
+  const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault()
+      const newTag = tagInput.trim()
+      if (newTag && !tags.includes(newTag)) {
+        setTags([...tags, newTag])
+        setTagInput('')
+      }
+    }
+  }
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(t => t !== tagToRemove))
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
     setError(null)
     try {
+      if (!user) {
+        throw new Error("You must be logged in to submit an opportunity.");
+      }
       if (!title || !provider || !url || !startDate || !endDate) {
         setError('Please fill required fields (Title, Provider, URL, and Dates)')
         setSubmitting(false)
         return
       }
-      const payload = { title, type, provider, startDate: startDate || undefined, endDate: endDate || undefined, url, description }
+
+      const payload = {
+        title,
+        type,
+        provider,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        url,
+        description,
+        tags // Send tags to backend
+      }
+
       const res = await submitOpportunity(payload)
       setSuccess(res.id)
+
+      // Reset form
       setTitle('')
       setProvider('')
       setUrl('')
       setDescription('')
+      setStartDate('')
+      setEndDate('')
+      setTags([])
     } catch (err: any) {
       setError(err.message || 'Submission failed')
     } finally {
@@ -75,6 +115,22 @@ export default function Submit() {
 
         <label className="block text-sm">Description</label>
         <textarea value={description} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(e.target.value)} className="w-full border rounded px-2 py-1 text-sm" />
+
+        <label className="block text-sm">Tags</label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {tags.map(tag => (
+            <span key={tag} className="bg-slate-200 text-slate-700 px-2 py-1 rounded text-sm flex items-center gap-1">
+              {tag}
+              <button type="button" onClick={() => removeTag(tag)} className="hover:text-red-500 font-bold">×</button>
+            </span>
+          ))}
+        </div>
+        <Input
+          value={tagInput}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTagInput(e.target.value)}
+          onKeyDown={handleTagKeyDown}
+          placeholder="Type a tag and press Enter"
+        />
 
         <div className="flex items-center justify-between">
           <button type="submit" disabled={submitting} className="bg-sky-600 text-white px-4 py-2 rounded">Submit</button>

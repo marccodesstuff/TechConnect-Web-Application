@@ -19,6 +19,8 @@ export default function OpportunitiesList() {
   const [query, setQuery] = useState('')
   const debouncedQuery = useDebounced(query, 350)
   const [type, setType] = useState<string | undefined>(undefined)
+  const [tag, setTag] = useState('')
+  const debouncedTag = useDebounced(tag, 350)
   const [loading, setLoading] = useState(false)
 
   const [total, setTotal] = React.useState(0)
@@ -28,18 +30,19 @@ export default function OpportunitiesList() {
     const q = new URLSearchParams()
     if (debouncedQuery) q.set('keyword', debouncedQuery)
     if (type) q.set('type', type)
+    if (debouncedTag) q.set('tag', debouncedTag)
     getOpportunities(q.toString())
       .then((res) => { setItems(res.items); setTotal(res.total) })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false))
-  }, [page, debouncedQuery, type])
+  }, [page, debouncedQuery, type, debouncedTag])
 
   const results = useMemo(() => items, [items])
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <aside className="md:col-span-1">
-        <Filters query={query} setQuery={setQuery} type={type} setType={setType} />
+        <Filters query={query} setQuery={setQuery} type={type} setType={setType} tag={tag} setTag={setTag} />
       </aside>
 
       <section className="md:col-span-3">

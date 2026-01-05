@@ -70,7 +70,8 @@ export async function submitOpportunity(payload: Partial<Opportunity>) {
     description: payload.description,
     startDate: payload.startDate,
     endDate: payload.endDate,
-    type: mappedType
+    type: mappedType,
+    tags: payload.tags
   };
 
   const response = await fetchJSON<BackendResponse<{ id: string | number }> | { id: string | number }>('/api/opportunities', {
@@ -97,4 +98,17 @@ export async function removeFavorite(id: string | number, token: string) {
     method: 'DELETE',
     headers: { Authorization: `Bearer ${token}` }
   })
+}
+
+export type AnalyticsStats = {
+  totalOpportunities: number
+  totalActiveOpportunities: number
+  opportunitiesByType: Record<string, number>
+}
+
+export async function getStats(token: string): Promise<AnalyticsStats> {
+  const response = await fetchJSON<BackendResponse<AnalyticsStats>>('/api/analytics/stats', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return response.data
 }
