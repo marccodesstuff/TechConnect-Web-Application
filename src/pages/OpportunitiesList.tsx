@@ -26,10 +26,8 @@ export default function OpportunitiesList() {
   useEffect(() => {
     setLoading(true)
     const q = new URLSearchParams()
-    if (debouncedQuery) q.set('query', debouncedQuery)
+    if (debouncedQuery) q.set('keyword', debouncedQuery)
     if (type) q.set('type', type)
-    q.set('page', String(page))
-    q.set('size', '10')
     getOpportunities(q.toString())
       .then((res) => { setItems(res.items); setTotal(res.total) })
       .catch((err) => console.error(err))

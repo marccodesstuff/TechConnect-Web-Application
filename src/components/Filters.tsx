@@ -11,8 +11,9 @@ export default function Filters({ query, setQuery, type, setType }: { query: str
       <label className="block text-sm mt-3 mb-2">Type</label>
       <select value={type ?? ''} onChange={(e) => setType && setType(e.target.value || undefined)} className="w-full border rounded px-2 py-1 text-sm">
         <option value="">All</option>
-        <option value="event">Event</option>
-        <option value="certification">Certification</option>
+        <option value="HACKATHON">Hackathon</option>
+        <option value="CERTIFICATION">Certification</option>
+        <option value="PROMO">Promo</option>
       </select>
     </div>
   )

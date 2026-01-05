@@ -8,7 +8,7 @@ export default function Submit() {
   const [error, setError] = useState<string | null>(null)
 
   const [title, setTitle] = useState('')
-  const [type, setType] = useState<Opportunity['type']>('event')
+  const [type, setType] = useState<Opportunity['type']>('HACKATHON')
   const [provider, setProvider] = useState('')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
@@ -51,9 +51,9 @@ export default function Submit() {
 
         <label className="block text-sm">Type</label>
         <select value={type} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setType(e.target.value as any)} className="w-full border rounded px-2 py-1 text-sm">
-          <option value="event">Event</option>
-          <option value="certification">Certification</option>
-          <option value="promo">Promo</option>
+          <option value="HACKATHON">Hackathon</option>
+          <option value="CERTIFICATION">Certification</option>
+          <option value="PROMO">Promo</option>
         </select>
 
         <label className="block text-sm">Provider *</label>
