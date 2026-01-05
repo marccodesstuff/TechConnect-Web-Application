@@ -112,3 +112,24 @@ export async function getStats(token: string): Promise<AnalyticsStats> {
   })
   return response.data
 }
+
+export type Notification = {
+  id: number
+  message: string
+  read: boolean
+  createdAt: string
+}
+
+export async function getNotifications(token: string): Promise<Notification[]> {
+  const response = await fetchJSON<BackendResponse<Notification[]>>('/api/notifications', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return response.data
+}
+
+export async function markNotificationRead(id: number, token: string) {
+  return fetchJSON(`/api/notifications/${id}/read`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}

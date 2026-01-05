@@ -9,6 +9,7 @@ import Register from './pages/Register'
 import Profile from './pages/Profile'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import { ThemeProvider, useTheme } from './context/ThemeContext' // Import Theme stuff
+import NotificationBell from './components/NotificationBell'
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
