@@ -84,3 +84,17 @@ export async function submitOpportunity(payload: Partial<Opportunity>) {
   }
   return { id: String((response as any).id) };
 }
+
+export async function addFavorite(id: string | number, token: string) {
+  return fetchJSON(`/api/opportunities/${id}/favorite`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
+
+export async function removeFavorite(id: string | number, token: string) {
+  return fetchJSON(`/api/opportunities/${id}/favorite`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` }
+  })
+}
